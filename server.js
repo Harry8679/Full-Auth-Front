@@ -2,10 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 
-const userRoutes = require('')
+const authRoutes = require('./routes/user.route');
 
 dotenv.config();
 const app = express();
@@ -20,7 +18,8 @@ mongoose
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.log(err));
 
-// Configuration de Nodemailer
+// Middlewares
+app.use('api/v1/auth', authRoutes);
 
 
 const PORT = process.env.PORT || 5000;
