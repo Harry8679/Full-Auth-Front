@@ -19,5 +19,8 @@ mongoose
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.log(err));
 
+// Configuration de Nodemailer
+
+
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => console.log(`Server launched on the port ${PORT}`));
