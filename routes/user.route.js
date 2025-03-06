@@ -1,10 +1,9 @@
 // routes/user.route.js
 const express = require('express');
+const { register } = require('../controllers/user.controller');
 const router = express.Router();
 
 // Exemple de route GET
-router.get('/', async (req, res) => {
-  res.send('This is a test');
-});
+router.post('/', register);
 
 module.exports = router; // Exporte le routeur
