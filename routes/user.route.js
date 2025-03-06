@@ -3,7 +3,7 @@ const express = require('express');
 const { register } = require('../controllers/user.controller');
 const router = express.Router();
 
-// Exemple de route GET
+// Registration
 router.post('/', register);
 
 module.exports = router; // Exporte le routeur

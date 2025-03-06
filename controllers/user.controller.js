@@ -1,5 +1,8 @@
 const register = async (req, res) => {
-  res.send('This is a test');
+  try {
+    const { name, email, password } = req.body;
+    const hashedPassword = await bcry
+  } catch(err) {}
 }
 
 module.exports = { register };
