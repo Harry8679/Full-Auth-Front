@@ -41,4 +41,8 @@ const verifyEmail = async(req, res) => {
   res.send('Verify Email')
 }
 
+const forgotPassword = async(req,res) => {
+  res.send('Forgot Password');
+}
+
 module.exports = { register, login, verifyEmail };
