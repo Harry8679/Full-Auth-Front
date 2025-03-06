@@ -4,7 +4,8 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
+
+const userRoutes = require('')
 
 dotenv.config();
 const app = express();
@@ -22,5 +23,5 @@ mongoose
 // Configuration de Nodemailer
 
 
-  const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => console.log(`Server launched on the port ${PORT}`));
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server launched on the port ${PORT}`));
