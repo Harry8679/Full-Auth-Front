@@ -37,4 +37,8 @@ const login = async (req, res) => {
   res.send('Login')
 }
 
-module.exports = { register, login };
+const verifyEmail = async(req, res) => {
+  res.send('Verify Email')
+}
+
+module.exports = { register, login, verifyEmail };
