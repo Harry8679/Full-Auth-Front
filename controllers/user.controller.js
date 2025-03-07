@@ -52,6 +52,11 @@ const login = async (req, res) => {
   }
 }
 
+// Show the profile
+const profile = async (req, res) => {
+  res.send('Profile');
+}
+
 const verifyEmail = async(req, res) => {
   res.send('Verify Email')
 }
@@ -60,4 +65,4 @@ const forgotPassword = async(req,res) => {
   res.send('Forgot Password');
 }
 
-module.exports = { register, login, verifyEmail };
+module.exports = { register, login, verifyEmail, profile };
