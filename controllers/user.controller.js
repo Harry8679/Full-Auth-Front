@@ -32,7 +32,7 @@ const register = async (req, res) => {
     await transporter.sendMail(mailOptions);
     res.status(201).json({ message: 'Utilisateur créé. Un mail vous a été envoyé.' })
   } catch(err) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: err.message });
   }
 }
 
