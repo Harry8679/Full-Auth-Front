@@ -1,18 +1,16 @@
 const nodemailer = require('nodemailer');
-const dotenv = require('dotenv');
-
-dotenv.config();
+require('dotenv').config();
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp-mail.outlook.com', // Serveur SMTP pour les comptes personnels
-  port: 587, // Port SMTP
-  secure: false, // Doit être false, car on utilise STARTTLS
+  host: 'smtp-mail.outlook.com', // Pour les comptes Outlook
+  port: 587, // Utilisation du port SMTP standard
+  secure: false, // Doit être false pour STARTTLS
   auth: {
     user: process.env.EMAIL_USER, // Ton email Outlook
-    pass: process.env.EMAIL_PASS, // Ton mot de passe Outlook (ou mot de passe d’application)
+    pass: process.env.EMAIL_PASS, // Ton mot de passe d'application
   },
   tls: {
-    rejectUnauthorized: false,
+    rejectUnauthorized: false, // Évite certains problèmes SSL
   },
 });
 
