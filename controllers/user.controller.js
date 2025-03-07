@@ -8,19 +8,23 @@ dotenv.config();
 
 // Registration
 const register = async (req, res) => {
+  const session = await User.startSession(); // Démarrer une session transactionnelle
+  session.startTransaction();
+
   try {
     const { name, email, password } = req.body;
 
     const existUser = await User.findOne({ email });
 
     if (existUser) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(400).json({ error: 'Cet email est déjà utilisé.' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ name, email, password: hashedPassword });
-    await newUser.save();
 
+    // Générer un token pour la vérification de l'email
     const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     const mailOptions = {
@@ -29,12 +33,25 @@ const register = async (req, res) => {
       subject: 'Confirmez votre email',
       html: `<p>Cliquez <a href="${process.env.CLIENT}/verify/${token}">ici</a> pour activer votre compte</p>`
     };
+
+    // Envoyer l'email AVANT de sauvegarder l'utilisateur
     await transporter.sendMail(mailOptions);
-    res.status(201).json({ message: 'Utilisateur créé. Un mail vous a été envoyé.' })
-  } catch(err) {
+
+    // Créer et enregistrer l'utilisateur seulement si l'email a bien été envoyé
+    const newUser = new User({ name, email, password: hashedPassword });
+    await newUser.save({ session });
+
+    await session.commitTransaction(); // Valider la transaction
+    session.endSession();
+
+    res.status(201).json({ message: 'Utilisateur créé. Un mail vous a été envoyé.' });
+  } catch (err) {
+    await session.abortTransaction(); // Annuler la transaction si une erreur survient
+    session.endSession();
     res.status(500).json({ error: err.message });
   }
-}
+};
+
 
 // Login
 const login = async (req, res) => {
