@@ -76,8 +76,27 @@ const verifyEmail = async(req, res) => {
   res.send('Verify Email')
 }
 
-const forgotPassword = async(req,res) => {
-  res.send('Forgot Password');
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ error: 'Utilisateur non trouvé' });
+   
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '15m' });
+    user.resetToken = token;
+    await user.save();
+   
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Réinitialisation du mot de passe',
+      html: `<p>Cliquez <a href="${process.env.CLIENT_URL}/reset-password/${token}">ici</a> pour réinitialiser votre mot de passe.</p>`
+    };
+    await transporter.sendMail(mailOptions);
+    res.json({ message: 'Email de réinitialisation envoyé' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 }
 
 module.exports = { register, login, verifyEmail, profile, updateProfile, forgotPassword };
