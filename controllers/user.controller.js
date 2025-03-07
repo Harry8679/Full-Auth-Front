@@ -54,7 +54,12 @@ const login = async (req, res) => {
 
 // Show the profile
 const profile = async (req, res) => {
-  res.send('Profile');
+  try {
+    const user = await User.findById(req.user.id);
+    res.json(user);
+  } catch(err) {
+    res.status(500).json({ error: err.message });
+  }
 }
 
 const verifyEmail = async(req, res) => {
