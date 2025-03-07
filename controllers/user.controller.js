@@ -100,7 +100,21 @@ const forgotPassword = async (req, res) => {
 }
 
 const resetPassword = async (req, res) => {
-  rese.send('Reset Password')
+  try {
+    const { token } = req.params;
+    const { newPassword } = req.body;
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findOne({ _id: decoded.id, resetToken: token });
+    if (!user) return res.status(400).json({ error: 'Token invalide ou expiré' });
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    user.resetToken = null;
+    await user.save();
+    res.json({ message: 'Mot de passe réinitialisé avec succès' });
+  } catch(err) {
+    res.send(500).json({ error: err.message });
+  }
 }
 
 module.exports = { register, login, verifyEmail, profile, updateProfile, forgotPassword, resetPassword };
