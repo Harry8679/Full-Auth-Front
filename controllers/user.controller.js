@@ -73,7 +73,23 @@ const updateProfile = async (req, res) => {
 }
 
 const verifyEmail = async(req, res) => {
-  res.send('Verify Email')
+  try {
+    const { token } = req.params;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const user = await User.findById(decoded.id);
+    if (!user) return res.status(400).json({ error: 'Utilisateur non trouvé' });
+
+    if (user.isVerified) {
+      return res.status(400).json({ error: 'Compte déjà vérifié' });
+    }
+    user.isVerified = true;
+    await user.save();
+
+    res.redirect(`${process.env.CLIENT_URL}/login?verified=true`);
+  } catch(err) {
+    res.status(400).json({ error: 'Lien invalide ou expiré' })
+  }
 }
 
 const forgotPassword = async (req, res) => {
