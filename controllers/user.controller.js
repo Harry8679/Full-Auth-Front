@@ -99,4 +99,8 @@ const forgotPassword = async (req, res) => {
   }
 }
 
-module.exports = { register, login, verifyEmail, profile, updateProfile, forgotPassword };
+const resetPassword = async (req, res) => {
+  rese.send('Reset Password')
+}
+
+module.exports = { register, login, verifyEmail, profile, updateProfile, forgotPassword, resetPassword };
