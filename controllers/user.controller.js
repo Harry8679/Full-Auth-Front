@@ -63,7 +63,13 @@ const profile = async (req, res) => {
 }
 
 const updateProfile = async (req, res) => {
-  res.send('Update profile');
+  try {
+    const { name, email } = req.body;
+    await User.findByIdAndUpdate(req.user.id, { name, email });
+    res.json({ message: 'Profil mis à jour' });
+  } catch(err) {
+    res.status(500).json({ error: err.message });
+  }
 }
 
 const verifyEmail = async(req, res) => {
