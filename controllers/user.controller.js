@@ -62,6 +62,10 @@ const profile = async (req, res) => {
   }
 }
 
+const updateProfile = async (req, res) => {
+  res.send('Update profile');
+}
+
 const verifyEmail = async(req, res) => {
   res.send('Verify Email')
 }
@@ -70,4 +74,4 @@ const forgotPassword = async(req,res) => {
   res.send('Forgot Password');
 }
 
-module.exports = { register, login, verifyEmail, profile };
+module.exports = { register, login, verifyEmail, profile, updateProfile };
