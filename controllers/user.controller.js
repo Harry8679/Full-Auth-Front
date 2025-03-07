@@ -80,4 +80,4 @@ const forgotPassword = async(req,res) => {
   res.send('Forgot Password');
 }
 
-module.exports = { register, login, verifyEmail, profile, updateProfile };
+module.exports = { register, login, verifyEmail, profile, updateProfile, forgotPassword };
