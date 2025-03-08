@@ -89,25 +89,28 @@ const updateProfile = async (req, res) => {
   }
 }
 
-const verifyEmail = async(req, res) => {
+const verifyEmail = async (req, res) => {
   try {
     const { token } = req.params;
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const user = await User.findById(decoded.id);
+    // ✅ Chercher l'utilisateur avec `email` et non `id`
+    const user = await User.findOne({ email: decoded.email });
+
     if (!user) return res.status(400).json({ error: 'Utilisateur non trouvé' });
 
     if (user.isVerified) {
       return res.status(400).json({ error: 'Compte déjà vérifié' });
     }
-    user.isVerified = true;
-    await user.save();
+
+    // ✅ Mettre à jour `isVerified`
+    await User.updateOne({ email: decoded.email }, { isVerified: true });
 
     res.redirect(`${process.env.CLIENT_URL}/login?verified=true`);
-  } catch(err) {
-    res.status(400).json({ error: 'Lien invalide ou expiré' })
+  } catch (err) {
+    res.status(400).json({ error: 'Lien invalide ou expiré' });
   }
-}
+};
 
 const forgotPassword = async (req, res) => {
   try {
