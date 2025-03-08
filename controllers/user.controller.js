@@ -48,10 +48,10 @@ const verifyEmail = async (req, res) => {
   try {
     const { token } = req.params;
 
-    // Vérification du token
+    // ✅ Vérifier et décoder le token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
-    // Mettre à jour isVerified à true
+    // ✅ Mettre à jour `isVerified: true`
     const user = await User.findOneAndUpdate(
       { email: decoded.email },
       { isVerified: true },
