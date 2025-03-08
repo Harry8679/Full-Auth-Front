@@ -1,17 +1,14 @@
 require('dotenv').config();
-const transporter = require('./config/nodemailer');
+const sendEmail = require('./config/sendgrid'); // Importer la fonction SendGrid
 
 const testMail = async () => {
   try {
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: 'destinataire@example.com', // Remplace par ton adresse de test
-      subject: 'Test Nodemailer avec Outlook',
-      text: 'Ceci est un test pour voir si Nodemailer fonctionne avec Outlook.',
-    };
-
-    const result = await transporter.sendMail(mailOptions);
-    console.log('✅ Email envoyé avec succès !', result);
+    await sendEmail(
+      'destinataire@example.com', // 🔹 Remplace par ton adresse de test
+      'Test SendGrid',
+      'Ceci est un test pour voir si SendGrid fonctionne correctement.'
+    );
+    console.log('✅ Email envoyé avec succès !');
   } catch (err) {
     console.error('❌ Erreur envoi email:', err);
   }
