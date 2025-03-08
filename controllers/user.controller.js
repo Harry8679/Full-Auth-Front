@@ -8,48 +8,39 @@ dotenv.config();
 
 // ✅ Inscription avec envoi de mail
 const register = async (req, res) => {
-  const session = await User.startSession();
-  session.startTransaction();
-
   try {
     const { name, email, password } = req.body;
 
     const existUser = await User.findOne({ email });
     if (existUser) {
-      await session.abortTransaction();
-      session.endSession();
       return res.status(400).json({ error: 'Cet email est déjà utilisé.' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // ✅ Génération du token pour vérifier l'email
+    
+    // ✅ Génération du token
     const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    // ✅ Affichage du token dans la console pour le récupérer facilement
+    // ✅ Afficher le token dans la console pour tester avec Postman
     console.log("Token de vérification:", token);
 
     // ✅ Modifier l'envoi de l'email avec SendGrid
     await sendEmail(
       email,
       'Confirmez votre email',
-      `Cliquez sur ce lien pour activer votre compte : ${process.env.CLIENT}/verify-email/${token}`
+      `Cliquez sur ce lien pour activer votre compte : ${process.env.CLIENT_URL}/verify-email/${token}`
     );
 
-    // ✅ Sauvegarde de l'utilisateur uniquement après l'envoi de l'email
-    const newUser = new User({ name, email, password: hashedPassword });
-    await newUser.save({ session });
-
-    await session.commitTransaction();
-    session.endSession();
+    // ✅ Sauvegarde de l'utilisateur seulement après envoi du mail
+    const newUser = new User({ name, email, password: hashedPassword, isVerified: false });
+    await newUser.save();
 
     res.status(201).json({ message: 'Utilisateur créé. Un mail vous a été envoyé.' });
   } catch (err) {
-    await session.abortTransaction();
-    session.endSession();
     res.status(500).json({ error: err.message });
   }
 };
+
 
 
 // ✅ Vérification de l'email (changement de isVerified: false -> true)
