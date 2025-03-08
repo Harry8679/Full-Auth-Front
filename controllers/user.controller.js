@@ -6,7 +6,7 @@ const sendEmail = require('../config/nodemailer'); // Assurez-vous que sendEmail
 
 dotenv.config();
 
-// 📌 ✅ Inscription (Register)
+// ✅ Inscription avec envoi de mail
 const register = async (req, res) => {
   const session = await User.startSession();
   session.startTransaction();
@@ -23,19 +23,22 @@ const register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 📌 ✅ Création de l'utilisateur
-    const newUser = new User({ name, email, password: hashedPassword });
-    await newUser.save({ session });
+    // ✅ Génération du token pour vérifier l'email
+    const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    // 📌 ✅ Génération du token avec l'ID de l'utilisateur
-    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    // ✅ Affichage du token dans la console pour le récupérer facilement
+    console.log("Token de vérification:", token);
 
-    // 📌 ✅ Envoi de l'email de confirmation avec le lien correct
+    // ✅ Modifier l'envoi de l'email avec SendGrid
     await sendEmail(
       email,
       'Confirmez votre email',
-      `Cliquez sur ce lien pour activer votre compte : ${process.env.CLIENT_URL}/verify-email/${token}`
+      `Cliquez sur ce lien pour activer votre compte : ${process.env.CLIENT}/verify-email/${token}`
     );
+
+    // ✅ Sauvegarde de l'utilisateur uniquement après l'envoi de l'email
+    const newUser = new User({ name, email, password: hashedPassword });
+    await newUser.save({ session });
 
     await session.commitTransaction();
     session.endSession();
@@ -48,40 +51,44 @@ const register = async (req, res) => {
   }
 };
 
-// 📌 ✅ Vérification de l'email (Verify Email)
+
+// ✅ Vérification de l'email (changement de isVerified: false -> true)
 const verifyEmail = async (req, res) => {
   try {
     const { token } = req.params;
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // 📌 ✅ Mise à jour de isVerified
-    const user = await User.findByIdAndUpdate(
-      decoded.id,
-      { $set: { isVerified: true } },
+    // Vérification du token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    // Mettre à jour isVerified à true
+    const user = await User.findOneAndUpdate(
+      { email: decoded.email },
+      { isVerified: true },
       { new: true }
     );
 
     if (!user) {
-      return res.status(400).json({ error: 'Utilisateur non trouvé' });
+      return res.status(400).json({ error: 'Utilisateur non trouvé ou déjà vérifié.' });
     }
 
-    res.redirect(`${process.env.CLIENT_URL}/login?verified=true`);
+    res.status(200).json({ message: 'Email vérifié avec succès !' });
   } catch (err) {
     res.status(400).json({ error: 'Lien invalide ou expiré' });
   }
 };
 
-// 📌 ✅ Connexion (Login)
+// ✅ Connexion
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
+
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(400).json({ error: 'Identifiants incorrects' });
     }
 
     if (!user.isVerified) {
-      return res.status(400).json({ error: 'Votre compte n\'est pas encore vérifié.' });
+      return res.status(400).json({ error: 'Veuillez vérifier votre email avant de vous connecter.' });
     }
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
