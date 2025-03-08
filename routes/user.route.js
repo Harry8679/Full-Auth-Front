@@ -19,7 +19,7 @@ router.post('/register', register);
 router.post('/login', login);
 
 // 📌 ✅ Route pour la vérification de l'email (mise à jour avec `PUT`)
-router.put('/verify-email/:token', verifyEmail);  // 🔥 Correctement mis en PUT !
+router.get('/verify-email/:token', verifyEmail);  // 🔥 Correctement mis en PUT !
 
 // 📌 ✅ Routes pour gérer le profil utilisateur
 router.get('/profile', authMiddleware, profile);
