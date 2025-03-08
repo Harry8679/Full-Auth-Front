@@ -7,15 +7,15 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 // Registration
+// 📌 ✅ Correction de register
 const register = async (req, res) => {
-  const session = await User.startSession(); // Démarrer une session transactionnelle
+  const session = await User.startSession();
   session.startTransaction();
 
   try {
     const { name, email, password } = req.body;
 
     const existUser = await User.findOne({ email });
-
     if (existUser) {
       await session.abortTransaction();
       session.endSession();
@@ -24,33 +24,32 @@ const register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Générer un token pour la vérification de l'email
+    // 📌 ✅ Génération du token pour vérifier l'email
     const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: 'Confirmez votre email',
-      html: `<p>Cliquez <a href="${process.env.CLIENT}/verify/${token}">ici</a> pour activer votre compte</p>`
-    };
+    // 📌 ✅ Modifier l'envoi de l'email avec SendGrid
+    await sendEmail(
+      email,
+      'Confirmez votre email',
+      `Cliquez sur ce lien pour activer votre compte : ${process.env.CLIENT}/verify/${token}`
+    );
 
-    // Envoyer l'email AVANT de sauvegarder l'utilisateur
-    await transporter.sendMail(mailOptions);
-
-    // Créer et enregistrer l'utilisateur seulement si l'email a bien été envoyé
+    // 📌 ✅ Sauvegarder l'utilisateur seulement si l'email a bien été envoyé
     const newUser = new User({ name, email, password: hashedPassword });
     await newUser.save({ session });
 
-    await session.commitTransaction(); // Valider la transaction
+    await session.commitTransaction();
     session.endSession();
 
     res.status(201).json({ message: 'Utilisateur créé. Un mail vous a été envoyé.' });
   } catch (err) {
-    await session.abortTransaction(); // Annuler la transaction si une erreur survient
+    await session.abortTransaction();
     session.endSession();
     res.status(500).json({ error: err.message });
   }
 };
+
+module.exports = { register };
 
 
 // Login

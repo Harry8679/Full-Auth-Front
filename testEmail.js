@@ -1,10 +1,11 @@
+const sendEmail = require('./config/nodemailer');
+
 require('dotenv').config();
-const sendEmail = require('./config/sendgrid'); // Importer la fonction SendGrid
 
 const testMail = async () => {
   try {
     await sendEmail(
-      'destinataire@example.com', // 🔹 Remplace par ton adresse de test
+      'xavi.lamachine@gmail.com', // 🔹 Remplace par ton adresse de test
       'Test SendGrid',
       'Ceci est un test pour voir si SendGrid fonctionne correctement.'
     );
