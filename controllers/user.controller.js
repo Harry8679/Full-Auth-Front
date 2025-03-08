@@ -32,7 +32,7 @@ const register = async (req, res) => {
     await sendEmail(
       email,
       'Confirmez votre email',
-      `Cliquez sur ce lien pour activer votre compte : ${process.env.CLIENT}/verify/${token}`
+      `Cliquez sur ce lien pour activer votre compte : ${process.env.CLIENT}/verify-email/${token}`
     );
 
     // 📌 ✅ Sauvegarder l'utilisateur seulement si l'email a bien été envoyé
