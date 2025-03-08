@@ -104,7 +104,8 @@ const verifyEmail = async (req, res) => {
     }
 
     // ✅ Mettre à jour `isVerified`
-    await User.updateOne({ email: decoded.email }, { isVerified: true });
+    // await User.updateOne({ email: decoded.email }, { isVerified: true });
+    await User.updateOne({ email: decoded.email }, { $set: { isVerified: true } });
 
     res.redirect(`${process.env.CLIENT_URL}/login?verified=true`);
   } catch (err) {
