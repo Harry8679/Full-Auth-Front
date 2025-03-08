@@ -3,6 +3,7 @@ const User = require('../models/user.model');
 const jwt = require('jsonwebtoken');
 const transporter = require('../config/nodemailer');
 const dotenv = require('dotenv');
+const sendEmail = require('../config/nodemailer');
 
 dotenv.config();
 
