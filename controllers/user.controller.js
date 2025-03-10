@@ -153,8 +153,26 @@ const resetPassword = async (req, res) => {
 };
 
 const changePassword = async (req, res) => {
-  res.send('Change Password');
-}
+  try {
+    const { oldPassword, newPassword } = req.body;
+
+    // Vérifier si l'utilisateur est bien connecté
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ error: 'Utilisateur non trouvé' });
+
+    // Vérifier que l'ancien mot de passe est correct
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) return res.status(400).json({ error: 'Ancien mot de passe incorrect' });
+
+    // Mettre à jour avec le nouveau mot de passe
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    res.json({ message: 'Mot de passe mis à jour avec succès !' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 
 // 📌 ✅ Export des contrôleurs
 module.exports = {
