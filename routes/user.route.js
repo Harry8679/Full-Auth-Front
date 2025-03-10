@@ -29,6 +29,6 @@ router.put('/profile', authMiddleware, updateProfile);
 // 📌 ✅ Routes pour la récupération de mot de passe
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password/:token', resetPassword);
-router.put('/change-password', changePassword);
+router.put('/change-password', authMiddleware, changePassword);
 
 module.exports = router;
