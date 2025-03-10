@@ -152,6 +152,10 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const changePassword = async (req, res) => {
+  res.send('Change Password');
+}
+
 // 📌 ✅ Export des contrôleurs
 module.exports = {
   register,
@@ -161,4 +165,5 @@ module.exports = {
   updateProfile,
   forgotPassword,
   resetPassword,
+  changePassword
 };
